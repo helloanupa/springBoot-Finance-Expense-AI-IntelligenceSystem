@@ -1,4 +1,4 @@
-# springBoot-Finance-Expense-AI-IntelligenceSystem
+# mern-Finance-Expense-AI-IntelligenceSystem
 
 # 🧠 AI Finance Expense Intelligence System
 
