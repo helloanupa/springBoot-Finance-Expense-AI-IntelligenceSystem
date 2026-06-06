@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, Zap, ArrowRight, ShieldCheck, TrendingUp, Brain } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Zap, ArrowRight, ShieldCheck, TrendingUp, Brain } from 'lucide-react';
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -11,6 +11,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +35,10 @@ export default function LoginPage() {
     <div className="auth-page">
       <div className="auth-card auth-card-split">
         <div className="auth-form-panel auth-form-panel-yellow">
+          <button type="button" className="auth-back-button" onClick={handleBack}>
+            <ArrowLeft size={16} /> Back
+          </button>
+
           <div className="auth-brand">
             <div className="brand-pill">FinanceAI</div>
           </div>
