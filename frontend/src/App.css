@@ -182,3 +182,60 @@
     border-right-color: var(--border);
   }
 }
+
+/* Professional footer */
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 48px 20px;
+  font-size: 14px;
+}
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+  gap: 28px;
+  align-items: start;
+}
+.footer-col h4 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: var(--text-h);
+}
+.footer-brand .brand-pill {
+  font-weight: 700;
+  font-size: 18px;
+}
+.footer-desc {
+  margin-top: 8px;
+  color: var(--text-muted);
+  max-width: 320px;
+  line-height: 1.45;
+}
+.footer-links { list-style: none; padding: 0; margin: 0; }
+.footer-links li { margin-bottom: 8px; }
+.footer-links a { color: var(--text-muted); text-decoration: none; }
+.footer-links a:hover { color: var(--text-h); text-decoration: underline; }
+.footer-socials { display: flex; gap: 12px; margin-top: 12px; }
+.social-link { color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; transition: color 0.15s ease, transform 0.15s ease; }
+.social-link:hover { color: var(--accent); transform: translateY(-2px); }
+.newsletter-form { display: flex; gap: 8px; margin-top: 12px; }
+.newsletter-form input { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--text); }
+.btn-subscribe { background: var(--accent); color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; }
+.btn-subscribe:hover { filter: brightness(0.95); }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 28px; padding-top: 20px; max-width: 1200px; margin-left: auto; margin-right: auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.footer-legal a { color: var(--text-muted); text-decoration: none; margin-left: 12px; }
+
+@media (max-width: 900px) {
+  .footer-container { grid-template-columns: 1fr 1fr; }
+  .footer-newsletter { order: 4; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
+@media (max-width: 560px) {
+  .footer-container { grid-template-columns: 1fr; }
+  .footer-brand .brand-pill { font-size: 16px; }
+}
+

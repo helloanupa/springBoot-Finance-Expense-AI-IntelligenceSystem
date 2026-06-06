@@ -4,6 +4,7 @@ import {
   Zap, Brain, TrendingUp, Shield, BarChart3, MessageSquare,
   ArrowRight, Sparkles
 } from 'lucide-react';
+import Footer from '../components/Footer';
 
 const features = [
   {
@@ -160,6 +161,7 @@ export default function LandingPage() {
           <Link to="/register" className="btn-primary btn-cta">Get Started</Link>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }
