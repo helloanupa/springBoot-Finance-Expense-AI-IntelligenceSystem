@@ -8,8 +8,16 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Budget target reached', description: 'You are within 5% of your monthly spending limit.', time: '2h ago', unread: true },
+    { id: 2, title: 'New AI insight ready', description: 'Review the latest spending prediction for your accounts.', time: '12h ago', unread: true },
+    { id: 3, title: 'Salary received', description: 'Your payment of $3,200 has arrived.', time: '1d ago', unread: false }
+  ]);
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
+
+  const unreadCount = notifications.filter((item) => item.unread).length;
 
   return (
     <div className="flex h-screen overflow-hidden app-root">
@@ -44,13 +52,47 @@ export default function Layout() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative">
             {/* Notifications */}
-            <button className="relative p-2 rounded-xl transition-all hover:bg-white/10"
-              style={{ color: 'var(--text-secondary)' }}>
-              <Bell size={18} />
-              <span className="notification-dot absolute top-1.5 right-1.5" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setNotificationsOpen((open) => !open)}
+                className="relative p-2 rounded-xl transition-all hover:bg-white/10"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && <span className="notification-dot absolute top-1.5 right-1.5" />}
+              </button>
+
+              {notificationsOpen && (
+                <div className="notification-panel">
+                  <div className="notification-panel-header">
+                    <span>Notifications</span>
+                    <button
+                      className="notification-clear"
+                      onClick={() => setNotifications((items) => items.map((item) => ({ ...item, unread: false })))}
+                    >
+                      Mark all read
+                    </button>
+                  </div>
+                  <div className="notification-list">
+                    {notifications.map((item) => (
+                      <button
+                        key={item.id}
+                        className={`notification-item ${item.unread ? 'unread' : ''}`}
+                        onClick={() => setNotifications((items) => items.map((n) => n.id === item.id ? { ...n, unread: false } : n))}
+                      >
+                        <div>
+                          <div className="notification-title">{item.title}</div>
+                          <div className="notification-desc">{item.description}</div>
+                        </div>
+                        <div className="notification-time">{item.time}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Theme toggle */}
             <button onClick={toggleTheme}

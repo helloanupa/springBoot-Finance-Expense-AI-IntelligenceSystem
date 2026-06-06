@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const [insights, setInsights] = useState([]);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [activePeriod, setActivePeriod] = useState('6M');
 
   useEffect(() => { loadAnalytics(); loadInsights(); }, []);
 
@@ -61,123 +62,155 @@ export default function DashboardPage() {
   const formatCurrency = (v) => `$${(v || 0).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
 
   return (
-    <div className="container p-4 md:p-6">
-      <div className="card-header">
+    <div className="dashboard-page container p-4 md:p-6">
+      <div className="glass-card dashboard-header-card">
         <div>
+          <div className="dashboard-badge">Monthly financial overview</div>
           <h1 className="page-title text-primary">Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name?.split(' ')[0]}</h1>
-          <p className="text-muted">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+          <p className="text-muted">Here is your latest performance snapshot for {format(new Date(), 'MMMM yyyy')}.</p>
         </div>
-        <div className="filter-bar">
-          <button className="small-btn btn-gradient" onClick={() => setShowAddModal(true)}><Plus size={14} /> Add</button>
-          <div className="chip">Last 6 months</div>
+
+        <div className="dashboard-header-actions">
+          <button className="small-btn btn-gradient" onClick={refetch}><RefreshCw size={14} /> Refresh</button>
+          <button className="small-btn btn-primary" onClick={() => setShowAddModal(true)}><Plus size={14} /> Add transaction</button>
         </div>
       </div>
 
-      <div className="kpi-grid mt-4">
-        <KPI label="Balance" value={formatCurrency(summary.balance)} delta={5.2} />
-        <KPI label="Income" value={formatCurrency(summary.income)} delta={12.5} />
-        <KPI label="Expenses" value={formatCurrency(summary.expense)} delta={-3.1} />
-        <KPI label="Budget Usage" value={`${user?.monthlyBudget ? Math.min((summary.expense/user.monthlyBudget)*100,100).toFixed(0) : 0}%`} delta={0} />
+      <div className="kpi-grid mt-5">
+        <KPI label="Current Balance" value={formatCurrency(summary.balance)} delta={5.2} icon="balance" />
+        <KPI label="Income" value={formatCurrency(summary.income)} delta={12.5} icon="income" />
+        <KPI label="Expenses" value={formatCurrency(summary.expense)} delta={-3.1} icon="expense" />
+        <KPI label="Budget Used" value={`${user?.monthlyBudget ? Math.min((summary.expense / user.monthlyBudget) * 100, 100).toFixed(0) : 0}%`} delta={0} icon="budget" />
       </div>
 
       <div className="chart-grid">
-        <div className="glass-card chart-card">
-          <h2 className="section-title">Income vs Expenses</h2>
+        <div className="glass-card chart-panel">
+          <div className="card-header card-header-spaced">
+            <div>
+              <h2 className="section-title">Cash flow trend</h2>
+              <p className="text-muted">Income and expenses across the last 6 months.</p>
+            </div>
+            <div className="metric-pill">{activePeriod === '6M' ? '+8.4% vs last period' : 'Stable performance'}</div>
+          </div>
+
           {loading ? <div className="skeleton h-56 mt-4" /> : (
-            <ResponsiveContainer width="100%" height={220} className="mt-2">
+            <ResponsiveContainer width="100%" height={240} className="mt-4">
               <AreaChart data={analyticsData}>
                 <defs>
-                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.3} /><stop offset="95%" stopColor="#10b981" stopOpacity={0} /></linearGradient>
-                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} /><stop offset="95%" stopColor="#6366f1" stopOpacity={0} /></linearGradient>
+                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.4} /><stop offset="95%" stopColor="#10b981" stopOpacity={0} /></linearGradient>
+                  <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} /><stop offset="95%" stopColor="#6366f1" stopOpacity={0} /></linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                <CartesianGrid strokeDasharray="4 4" stroke="var(--border-color)" vertical={false} />
                 <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
-                <Tooltip />
-                <Area type="monotone" dataKey="income" stroke="#10b981" fill="url(#incomeGrad)" strokeWidth={2} dot={false} />
-                <Area type="monotone" dataKey="expense" stroke="#6366f1" fill="url(#expenseGrad)" strokeWidth={2} dot={false} />
+                <Tooltip contentStyle={{ borderRadius: 16, border: '1px solid rgba(148, 163, 184, 0.15)' }} />
+                <Area type="monotone" dataKey="income" stroke="#10b981" fill="url(#incomeGrad)" strokeWidth={3} dot={false} />
+                <Area type="monotone" dataKey="expense" stroke="#6366f1" fill="url(#expenseGrad)" strokeWidth={3} dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           )}
-        </div>
 
-        <div className="glass-card chart-card">
-          <h2 className="section-title">Spending Categories</h2>
-          {categoryData.length === 0 ? (
-            <div className="muted-center">No expense categories yet</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={200} className="mt-2">
-              <PieChart>
-                <Pie data={categoryData} cx="50%" cy="50%" innerRadius={40} outerRadius={70} dataKey="value" paddingAngle={3}>
-                  {categoryData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          )}
-        </div>
-      </div>
-
-      <div className="dashboard-grid mt-6">
-        <div>
-          <div className="glass-card transactions-card">
-            <div className="card-header">
-              <h3 className="section-title">Recent Transactions</h3>
+          <div className="chart-stats-row">
+            <div className="stat-pill">
+              <span>Net Revenue</span>
+              <strong>{formatCurrency(summary.income - summary.expense)}</strong>
             </div>
-            {loading ? (
-              <div className="skeleton h-40 mt-4" />
-            ) : transactions.length === 0 ? (
-              <div className="muted-center">No transactions yet</div>
-            ) : (
-              <table className="transactions-table mt-3">
-                <thead>
-                  <tr><th>Date</th><th>Description</th><th>Category</th><th className="text-right">Amount</th></tr>
-                </thead>
-                <tbody>
-                  {transactions.map(tx => (
-                    <tr key={tx._id}>
-                      <td>{format(new Date(tx.date), 'MMM d')}</td>
-                      <td>{tx.description}</td>
-                      <td>{tx.category}</td>
-                      <td className="text-right" style={{ color: tx.type === 'income' ? '#10b981' : '#ef4444' }}>{tx.type === 'income' ? '+' : '-'}${tx.amount.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            <div className="stat-pill">
+              <span>Forecast</span>
+              <strong>{formatCurrency((summary.income - summary.expense) * 1.08)}</strong>
+            </div>
           </div>
         </div>
 
         <aside className="right-panel">
-          <div className="glass-card">
-            <div className="card-header">
-              <h3 className="section-title">AI Insights</h3>
+          <div className="glass-card summary-card">
+            <div className="card-header card-header-spaced">
+              <div>
+                <h3 className="section-title">Your summary</h3>
+                <p className="text-muted">Key numbers to keep your finances on track.</p>
+              </div>
+            </div>
+            <div className="summary-grid">
+              <div className="summary-item">
+                <span>Available funds</span>
+                <strong>{formatCurrency(summary.balance)}</strong>
+              </div>
+              <div className="summary-item">
+                <span>Income</span>
+                <strong>{formatCurrency(summary.income)}</strong>
+              </div>
+              <div className="summary-item">
+                <span>Expenses</span>
+                <strong>{formatCurrency(summary.expense)}</strong>
+              </div>
+              <div className="summary-item">
+                <span>Budget remaining</span>
+                <strong>{user?.monthlyBudget ? formatCurrency(Math.max(user.monthlyBudget - summary.expense, 0)) : '—'}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card insights-card">
+            <div className="card-header card-header-spaced">
+              <h3 className="section-title">AI insights</h3>
               <button className="small-btn btn-gradient" onClick={generateInsights}><RefreshCw size={14} /></button>
             </div>
             {insights.length === 0 ? (
-              <div className="muted-center">No insights — generate one</div>
+              <div className="muted-center">No insights available yet.</div>
             ) : (
-              <div className="mt-3 space-y-2">
-                {insights.map((ins, i) => (
-                  <div key={i} className="glass-card" style={{ background: 'var(--bg-secondary)' }}>
-                    <div style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 600 }}>{ins.title}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{ins.message}</div>
+              <div className="mt-3 space-y-3">
+                {insights.map((ins, index) => (
+                  <div key={index} className="insight-card">
+                    <div className="insight-title">{ins.title}</div>
+                    <div className="insight-text">{ins.message}</div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-
-          <div className="glass-card">
-            <h3 className="section-title">Budget</h3>
-            <div className="mt-2">
-              <div className="text-muted">Monthly Budget</div>
-              <div className="kpi-value mt-1">{user?.monthlyBudget ? `$${user.monthlyBudget}` : 'Not set'}</div>
-            </div>
-          </div>
         </aside>
       </div>
 
-      {showAddModal && (<AddTransactionModal onClose={() => setShowAddModal(false)} onAdd={async (data) => { await api.post('/transactions', data); setShowAddModal(false); refetch(); }} />)}
+      <div className="glass-card transactions-card mt-6">
+        <div className="card-header card-header-spaced">
+          <div>
+            <h3 className="section-title">Recent transactions</h3>
+            <p className="text-muted">Latest entries from your account activity.</p>
+          </div>
+          <div className="dashboard-table-actions">
+            <button className="small-btn btn-secondary">Export CSV</button>
+            <button className="small-btn btn-gradient" onClick={() => setShowAddModal(true)}>New entry</button>
+          </div>
+        </div>
+        {loading ? (
+          <div className="skeleton h-40 mt-4" />
+        ) : transactions.length === 0 ? (
+          <div className="muted-center">No transactions yet</div>
+        ) : (
+          <table className="transactions-table mt-3">
+            <thead>
+              <tr><th>Date</th><th>Description</th><th>Category</th><th className="text-right">Amount</th></tr>
+            </thead>
+            <tbody>
+              {transactions.map((tx) => (
+                <tr key={tx._id}>
+                  <td>{format(new Date(tx.date), 'MMM d')}</td>
+                  <td>{tx.description}</td>
+                  <td>{tx.category}</td>
+                  <td className="text-right" style={{ color: tx.type === 'income' ? '#10b981' : '#ef4444' }}>{tx.type === 'income' ? '+' : '-'}${tx.amount.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {showAddModal && (
+        <AddTransactionModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={async (data) => { await api.post('/transactions', data); setShowAddModal(false); refetch(); }}
+        />
+      )}
     </div>
   );
 }
