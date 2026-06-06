@@ -12,10 +12,10 @@ export default function Layout() {
   const { user } = useAuth();
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+    <div className="flex h-screen overflow-hidden app-root">
       {/* Sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <div className="w-64">
+        <div style={{ width: 'var(--sidebar-width)' }}>
           <Sidebar isOpen={true} setIsOpen={() => {}} />
         </div>
       </div>
@@ -28,8 +28,7 @@ export default function Layout() {
       {/* Main area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top header */}
-        <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b flex-shrink-0"
-          style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+        <header className="flex items-center justify-between px-4 md:px-6 py-4 flex-shrink-0 top-header">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -39,8 +38,7 @@ export default function Layout() {
               <Menu size={20} />
             </button>
             {/* Search bar */}
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl"
-              style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', width: '280px', color: 'var(--text-muted)' }}>
+            <div className="hidden md:flex items-center gap-2 search-box">
               <Search size={16} />
               <span className="text-sm">Search transactions...</span>
             </div>
@@ -74,7 +72,7 @@ export default function Layout() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="h-full mx-auto max-w-[1440px]"
+            className="h-full container mx-auto"
           >
             <Outlet />
           </motion.div>

@@ -44,8 +44,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         initial={false}
         animate={{ x: isOpen ? 0 : '-100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="sidebar fixed left-0 top-0 h-full w-64 z-50 flex flex-col lg:relative lg:translate-x-0"
-        style={{ background: 'var(--bg-secondary)', borderRight: '1px solid var(--border-color)' }}
+        className="sidebar fixed left-0 top-0 h-full z-50 flex flex-col lg:relative lg:translate-x-0"
       >
         {/* Logo */}
         <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
