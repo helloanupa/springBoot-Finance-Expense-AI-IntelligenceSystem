@@ -233,7 +233,7 @@ export default function LandingPage() {
           <span className="font-bold gradient-text">FinanceAI</span>
         </div>
         <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-          © 2025 FinanceAI. Built with ❤️ and AI
+          © 2025 FinanceAI. Built with NT and AI
         </p>
       </footer>
     </div>
