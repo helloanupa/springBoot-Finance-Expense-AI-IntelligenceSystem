@@ -8,6 +8,7 @@ import { Eye, EyeOff, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -23,14 +24,16 @@ export default function RegisterPage() {
     const levels = [
       { label: 'Very Weak', color: '#ef4444', width: 20 },
       { label: 'Weak', color: '#f59e0b', width: 40 },
-      { label: 'Fair', color: '#f59e0b', width: 60 },
-      { label: 'Strong', color: '#10b981', width: 80 },
-      { label: 'Very Strong', color: '#10b981', width: 100 }
+      { label: 'Medium', color: '#fbbf24', width: 60 },
+      { label: 'Strong', color: '#10b981', width: 85 },
+      { label: 'Very Strong', color: '#34d399', width: 100 }
     ];
-    return levels[score - 1] || levels[0];
+    return levels[Math.min(score - 1, 4)] || levels[0];
   };
 
   const strength = passwordStrength(form.password);
+  const passwordsMatch = form.confirm && form.password === form.confirm;
+  const passwordsVisible = form.password && form.confirm;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,97 +54,131 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--bg-primary)' }}>
-      {/* Background decorator */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-96 h-96 rounded-full blur-3xl opacity-10 float-animation"
-          style={{ background: 'radial-gradient(circle, #6366f1, transparent)', top: '-10%', right: '-10%' }} />
-        <div className="absolute w-64 h-64 rounded-full blur-3xl opacity-10 float-animation"
-          style={{ background: 'radial-gradient(circle, #8b5cf6, transparent)', bottom: '10%', left: '-5%', animationDelay: '2s' }} />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
-      >
-        <div className="glass-card p-8">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-9 h-9 rounded-xl btn-gradient flex items-center justify-center pulse-glow">
-              <Zap size={18} className="text-white" />
-            </div>
-            <span className="text-xl font-bold gradient-text">FinanceAI</span>
+    <div className="auth-page">
+      <div className="auth-card auth-card-split">
+        <div className="auth-form-panel auth-form-panel-yellow">
+          <div className="auth-brand">
+            <div className="brand-pill">FinanceAI</div>
+          </div>
+          <div className="auth-copy">
+            <h1>Create an account</h1>
+            <p>Sign up and get a 30-day free trial with intelligent finance insights.</p>
           </div>
 
-          <h2 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Create your account</h2>
-          <p className="text-sm mb-8" style={{ color: 'var(--text-muted)' }}>Start your AI-powered financial journey</p>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <label>
+              <span>Full name</span>
+              <input
+                type="text"
+                className="auth-input"
+                placeholder="Amélie Laurent"
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                required
+              />
+            </label>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Full Name</label>
-              <input type="text" className="input-field" placeholder="John Doe"
-                value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
-            </div>
+            <label>
+              <span>Email</span>
+              <input
+                type="email"
+                className="auth-input"
+                placeholder="amélielaurent7622@gmail.com"
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                required
+              />
+            </label>
 
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Email</label>
-              <input type="email" className="input-field" placeholder="you@example.com"
-                value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Password</label>
-              <div className="relative">
-                <input type={showPass ? 'text' : 'password'} className="input-field pr-12" placeholder="Min. 6 characters"
-                  value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required />
-                <button type="button" onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
-                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+            <label>
+              <span>Password</span>
+              <div className="auth-input-group">
+                <input
+                  type={showPass ? 'text' : 'password'}
+                  className="auth-input auth-input-password"
+                  placeholder="••••••••••••••••"
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPass(!showPass)}
+                >
+                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              {form.password && (
-                <div className="mt-2 space-y-1">
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${strength.width}%` }}
-                      className="h-full rounded-full transition-all"
-                      style={{ background: strength.color }}
-                    />
-                  </div>
-                  <p className="text-xs" style={{ color: strength.color }}>{strength.label}</p>
-                </div>
-              )}
-            </div>
+            </label>
 
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Confirm Password</label>
-              <div className="relative">
-                <input type="password" className="input-field pr-12" placeholder="Repeat password"
-                  value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} required />
-                {form.confirm && form.password === form.confirm && (
-                  <CheckCircle2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#10b981' }} />
-                )}
+            <label>
+              <span>Confirm password</span>
+              <div className="auth-input-group">
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  className="auth-input auth-input-password"
+                  placeholder="••••••••••••••••"
+                  value={form.confirm}
+                  onChange={e => setForm({ ...form, confirm: e.target.value })}
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                >
+                  {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-            </div>
+            </label>
 
-            <button type="submit" disabled={loading}
-              className="btn-gradient w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 text-sm mt-2">
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>Create Account <ArrowRight size={16} /></>
-              )}
+            <button type="submit" disabled={loading || !passwordsMatch} className="auth-submit auth-submit-yellow">
+              {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
-          <p className="text-center text-sm mt-6" style={{ color: 'var(--text-muted)' }}>
-            Already have an account?{' '}
-            <Link to="/login" className="font-semibold animated-underline" style={{ color: 'var(--accent-blue)' }}>Sign in</Link>
+          <div className="social-buttons">
+            <button className="auth-social auth-social-light"><span></span> Apple</button>
+            <button className="auth-social auth-social-light"><span>G</span> Google</button>
+          </div>
+
+          <p className="auth-footer">
+            Already have an account? <Link to="/login">Sign in</Link>
           </p>
         </div>
-      </motion.div>
+
+        <div className="auth-visual-panel">
+          <div className="hero-content">
+            <div className="hero-pill">Task Review With Team</div>
+            <div className="hero-title">Stay productive with one clean workspace.</div>
+            <div className="hero-subtitle">Visualize your schedule, meetings, and key collaborators at a glance.</div>
+          </div>
+
+          <div className="hero-card">
+            <div className="hero-calendar">
+              <div className="hero-day active">Sun<br /><strong>22</strong></div>
+              <div className="hero-day">Mon<br /><strong>23</strong></div>
+              <div className="hero-day">Tue<br /><strong>24</strong></div>
+              <div className="hero-day">Wed<br /><strong>25</strong></div>
+              <div className="hero-day">Thu<br /><strong>26</strong></div>
+              <div className="hero-day">Fri<br /><strong>27</strong></div>
+              <div className="hero-day">Sat<br /><strong>28</strong></div>
+            </div>
+
+            <div className="hero-info-card">
+              <div>
+                <div className="hero-info-label">Daily Meeting</div>
+                <div className="hero-info-time">12:00pm - 01:00pm</div>
+              </div>
+              <div className="avatar-row">
+                <div className="avatar avatar-lg" />
+                <div className="avatar avatar-sm" />
+                <div className="avatar avatar-sm" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
